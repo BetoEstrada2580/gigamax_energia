@@ -182,6 +182,22 @@ function calcularArbol() {
 
     let html = `<h5 class="fw-bold mb-3"><i class="fa-solid fa-route text-success me-2"></i>${rutasEncontradas.length} Ruta(s) Encontrada(s) [${minSaldo} - ${maxSaldo} MP]:</h5>`;
 
+    // Ordenar resultados:
+    // 1. Primero de MAYOR a MENOR saldo final (b.saldoFinal - a.saldoFinal)
+    // 2. Si empatan en saldo, prioritariamente las que incluyan caminata > 0
+    // 3. Si siguen empatando, la que tenga menos pasos
+    rutasEncontradas.sort((a, b) => {
+        if (b.saldoFinal !== a.saldoFinal) {
+            return b.saldoFinal - a.saldoFinal; // Mayor a menor
+        }
+
+        let camA = a.pasos.some((p) => p.accionId === "cam" && p.recolectado > 0) ? 1 : 0;
+        let camB = b.pasos.some((p) => p.accionId === "cam" && p.recolectado > 0) ? 1 : 0;
+        if (camA !== camB) return camB - camA;
+
+        return a.pasos.length - b.pasos.length;
+    });
+
     rutasEncontradas.forEach((ruta, idx) => {
         const tieneCaminata = ruta.pasos.some(
             (p) => p.accionId === "cam" && p.recolectado > 0,
@@ -226,8 +242,9 @@ function calcularArbol() {
         </table>
         </div>
         </div>
-        <div class="card-footer bg-light small text-muted text-end">
-            Si reclamas los <strong>${restanteDiarioIni} MP</strong> pendientes tras esta ruta, quedarás en <strong>${ruta.saldoFinal} MP</strong>.
+        <div class="card-footer bg-light small text-muted text-start">
+        En esta ruta reclamarias <strong>${restanteDiarioIni - ruta.cupoRestante} MP</strong> de tu restante. 
+        Te faltarian <strong>${ruta.cupoRestante} MP</strong> por reclamar de los <strong>800 diarios</strong>.
         </div>
     </div>`;
     });
