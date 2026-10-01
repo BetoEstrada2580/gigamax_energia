@@ -81,7 +81,6 @@ function calcularArbol() {
     const minSaldo = parseInt(document.getElementById("minSaldo").value) || 900;
     const maxSaldo = parseInt(document.getElementById("maxSaldo").value) || 1190;
 
-    const CAPACIDAD_MAX = 1700;
     const LIMITE_RECOLECCION = 1500;
     const MAX_DIARIO = 800;
 
@@ -123,7 +122,7 @@ function calcularArbol() {
                     : 0;
             let recEfectiva = Math.min(
                 recPotencial,
-                Math.max(0, CAPACIDAD_MAX - saldoActual)
+                saldoActual
             );
 
             // -------------------------------------------------------------------
