@@ -26,10 +26,10 @@ const CATALOGO_ACCIONES = [
     },
     {
         id: "mov1",
-        nombre: "Subir movimiento nivel 1",
+        nombre: "Desbloquear movimiento Dinamax",
         costo: 400,
         baseRec: 0,
-        icono: "fa-gamepad text-primary",
+        icono: "fa-unlock text-success",
         activoPorDefecto: true,
     },
     {
@@ -37,7 +37,7 @@ const CATALOGO_ACCIONES = [
         nombre: "Subir movimiento nivel 2",
         costo: 600,
         baseRec: 0,
-        icono: "fa-gamepad text-primary",
+        icono: "fa-dumbbell text-primary",
         activoPorDefecto: true,
     },
     {
@@ -45,7 +45,7 @@ const CATALOGO_ACCIONES = [
         nombre: "Subir movimiento nivel 3",
         costo: 800,
         baseRec: 0,
-        icono: "fa-gamepad text-primary",
+        icono: "fa-dumbbell text-primary",
         activoPorDefecto: true,
     },
 ];
@@ -57,20 +57,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     contenedor.innerHTML = CATALOGO_ACCIONES.map(
         (acc) => `
-    <div class="col-sm-6">
-      <div class="form-check form-switch">
-        <input 
-          class="form-check-input chk-accion" 
-          type="checkbox" 
-          id="chk_${acc.id}" 
-          value="${acc.id}" 
-          ${acc.activoPorDefecto ? "checked" : ""}>
-        <label class="form-check-label small" for="chk_${acc.id}">
-          <i class="fa-solid ${acc.icono} me-1"></i>${acc.nombre}
-        </label>
-      </div>
-    </div>
-  `,
+        <div class="col-sm-6">
+            <div class="form-check form-switch">
+                <input 
+                class="form-check-input chk-accion" 
+                type="checkbox" 
+                id="chk_${acc.id}" 
+                value="${acc.id}" 
+                ${acc.activoPorDefecto ? "checked" : ""}>
+                <label class="form-check-label small" for="chk_${acc.id}">
+                <i class="fa-solid ${acc.icono} me-1"></i>${acc.nombre}
+                </label>
+            </div>
+        </div>
+    `,
     ).join("");
 });
 
@@ -123,22 +123,21 @@ function calcularArbol() {
                     : 0;
             let recEfectiva = Math.min(
                 recPotencial,
-                Math.max(0, CAPACIDAD_MAX - saldoActual),
+                Math.max(0, CAPACIDAD_MAX - saldoActual)
             );
+
+            // -------------------------------------------------------------------
+            // Si la acción es caminata y no puede recolectar MP (> 0), no tiene sentido ejecutarla como paso del árbol.
+            // -------------------------------------------------------------------
+            if (acc.id === "cam" && recEfectiva === 0) {
+                continue;
+            }
+
             let saldoAntesPago = saldoActual + recEfectiva;
 
             if (saldoAntesPago >= acc.costo) {
                 let saldoFinal = saldoAntesPago - acc.costo;
                 let nuevoCupo = cupoDiario - recEfectiva;
-
-                // Evitar duplicar caminata consecutiva si dio 0 MP
-                if (
-                    acc.id === "cam" &&
-                    recEfectiva === 0 &&
-                    historial.some((p) => p.accionId === "cam" && p.recolectado === 0)
-                ) {
-                    continue;
-                }
 
                 explorar(saldoFinal, nuevoCupo, [
                     ...historial,
@@ -177,7 +176,7 @@ function calcularArbol() {
     if (rutasEncontradas.length === 0) {
         container.innerHTML = `
     <div class="alert alert-warning text-center">
-      <i class="fa-solid fa-triangle-exclamation me-2"></i>No se encontraron rutas que terminen exactamente en el rango de <strong>${minSaldo} a ${maxSaldo} MP</strong> con las acciones seleccionadas.
+        <i class="fa-solid fa-triangle-exclamation me-2"></i>No se encontraron rutas que terminen exactamente en el rango de <strong>${minSaldo} a ${maxSaldo} MP</strong> con las acciones seleccionadas.
     </div>`;
         return;
     }
@@ -190,47 +189,47 @@ function calcularArbol() {
         );
 
         html += `
-    <div class="card card-custom shadow-sm mb-3 bg-white">
-      <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-        <span class="fw-bold text-dark">Opción ${idx + 1} (${ruta.pasos.length} pasos)</span>
-        <div>
-          ${tieneCaminata ? '<span class="badge bg-info text-dark me-1"><i class="fas fa-shoe-prints me-1"></i>Incluye 2km</span>' : ""}
-          <span class="badge bg-success">Saldo Final: ${ruta.saldoFinal} MP</span>
+        <div class="card card-custom shadow-sm mb-3 bg-white">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-dark">Opción ${idx + 1} (${ruta.pasos.length} pasos)</span>
+            <div>
+            ${tieneCaminata ? '<span class="badge bg-info text-dark me-1"><i class="fas fa-shoe-prints me-1"></i>Incluye 2km</span>' : ""}
+            <span class="badge bg-success">Saldo Final: ${ruta.saldoFinal} MP</span>
+            </div>
         </div>
-      </div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-sm table-hover mb-0 text-center align-middle" style="font-size: 0.85rem;">
-            <thead class="table-light">
-              <tr>
-                <th>Acción</th>
-                <th>Inicio</th>
-                <th>Recolección</th>
-                <th>Costo</th>
-                <th>Final</th>
-              </tr>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0 text-center align-middle" style="font-size: 0.85rem;">
+                <thead class="table-light">
+                <tr>
+                    <th>Acción</th>
+                    <th>Inicio</th>
+                    <th>Recolección</th>
+                    <th>Costo</th>
+                    <th>Final</th>
+                </tr>
             </thead>
             <tbody>`;
 
         ruta.pasos.forEach((p) => {
             html += `
-      <tr>
-        <td class="text-start ps-3"><i class="fa-solid ${p.icono} me-1"></i>${p.nombre}</td>
-        <td>${p.saldoInicial} MP</td>
-        <td class="${p.recolectado > 0 ? "text-success fw-bold" : "text-muted"}">+${p.recolectado} MP</td>
-        <td class="${p.costo > 0 ? "text-danger" : "text-muted"}">-${p.costo} MP</td>
-        <td class="fw-bold">${p.saldoFinal} MP</td>
-      </tr>`;
+        <tr>
+            <td class="text-start ps-3"><i class="fa-solid ${p.icono} me-1"></i>${p.nombre}</td>
+            <td>${p.saldoInicial} MP</td>
+            <td class="${p.recolectado > 0 ? "text-success fw-bold" : "text-muted"}">+${p.recolectado} MP</td>
+            <td class="${p.costo > 0 ? "text-danger" : "text-muted"}">-${p.costo} MP</td>
+            <td class="fw-bold">${p.saldoFinal} MP</td>
+        </tr>`;
         });
 
         html += `
-            </tbody>
-          </table>
+        </tbody>
+        </table>
         </div>
-      </div>
-      <div class="card-footer bg-light small text-muted text-end">
-        Si reclamas los <strong>${restanteDiarioIni} MP</strong> pendientes tras esta ruta, quedarás en <strong>${ruta.saldoFinal} MP</strong>.
-      </div>
+        </div>
+        <div class="card-footer bg-light small text-muted text-end">
+            Si reclamas los <strong>${restanteDiarioIni} MP</strong> pendientes tras esta ruta, quedarás en <strong>${ruta.saldoFinal} MP</strong>.
+        </div>
     </div>`;
     });
 
