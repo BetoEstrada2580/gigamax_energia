@@ -61,17 +61,17 @@
           <div class="col-md-6">
             <label class="form-label fw-semibold small">
               <i class="fa-solid fa-calendar-check text-success me-1"></i
-              >Reclamado Hoy (Máx 800):
+              >PM restante por reclamar hoy (Máx 800):
             </label>
             <input
               type="number"
               id="reclamosHoy"
               class="form-control"
-              value="0"
+              value="800"
               min="0"
               max="800" />
             <div class="text-muted small" style="font-size: 0.75rem">
-              Cantidad de partículas que has reclamado hoy
+              Cantidad de partículas que te faltan por reclamar hoy
             </div>
           </div>
 
@@ -81,19 +81,19 @@
               Objetivo Saldo Final (MP):
             </label>
             <div class="input-group">
-              <span class="input-group-text bg-light small">Mín: 1100</span>
+              <span class="input-group-text bg-light small">Minimo</span>
               <input
                 type="number"
                 id="minSaldo"
                 class="form-control"
-                value="1100"
+                value="1500"
                 min="0" />
-              <span class="input-group-text bg-light small">Máx: 1190</span>
+              <span class="input-group-text bg-light small">Maximo</span>
               <input
                 type="number"
                 id="maxSaldo"
                 class="form-control"
-                value="1190" />
+                value="1800" />
             </div>
             <div class="form-text text-muted" style="font-size: 0.75rem">
               Solo se mostrarán rutas cuyo saldo final quede exactamente en este

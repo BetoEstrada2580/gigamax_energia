@@ -1,7 +1,7 @@
 // Catálogo Global de Acciones (Fuera de la función)
 const CATALOGO_ACCIONES = [
     {
-        id: "cam",
+        id: "rec1",
         nombre: "Reclamar 2km (Caminata)",
         costo: 0,
         baseRec: 300,
@@ -48,6 +48,14 @@ const CATALOGO_ACCIONES = [
         icono: "fa-dumbbell text-primary",
         activoPorDefecto: true,
     },
+    {
+        id: "rec2",
+        nombre: "Recolectar nodo sin pelear",
+        costo: 0,
+        baseRec: 120,
+        icono: "fa-dove text-primary",
+        activoPorDefecto: true,
+    },
 ];
 
 // Generar dinámicamente los Checkboxes al cargar el DOM
@@ -84,7 +92,9 @@ function calcularArbol() {
     const LIMITE_RECOLECCION = 1500;
     const MAX_DIARIO = 800;
 
-    const restanteDiarioIni = Math.max(0, MAX_DIARIO - reclamosHoy);
+    const restanteDiarioIni = Math.max(0, reclamosHoy);
+
+    console.log(restanteDiarioIni);
 
     // Obtener únicamente los IDs de los checkboxes seleccionados
     const IDsSeleccionados = Array.from(
@@ -118,17 +128,14 @@ function calcularArbol() {
         for (let acc of ACCIONES) {
             let recPotencial =
                 saldoActual < LIMITE_RECOLECCION
-                    ? Math.min(acc.baseRec, cupoDiario)
+                    ? acc.baseRec
                     : 0;
-            let recEfectiva = Math.min(
-                recPotencial,
-                saldoActual
-            );
+            let recEfectiva = recPotencial;
 
             // -------------------------------------------------------------------
             // Si la acción es caminata y no puede recolectar MP (> 0), no tiene sentido ejecutarla como paso del árbol.
             // -------------------------------------------------------------------
-            if (acc.id === "cam" && recEfectiva === 0) {
+            if (acc.id === "rec1" && recEfectiva === 0) {
                 continue;
             }
 
@@ -158,10 +165,10 @@ function calcularArbol() {
 
     // Ordenar resultados: prioritariamente las rutas que cobraron caminata > 0, luego menos pasos
     rutasEncontradas.sort((a, b) => {
-        let camA = a.pasos.some((p) => p.accionId === "cam" && p.recolectado > 0)
+        let camA = a.pasos.some((p) => p.accionId === "rec1" && p.recolectado > 0)
             ? 1
             : 0;
-        let camB = b.pasos.some((p) => p.accionId === "cam" && p.recolectado > 0)
+        let camB = b.pasos.some((p) => p.accionId === "rec1" && p.recolectado > 0)
             ? 1
             : 0;
         if (camA !== camB) return camB - camA;
@@ -191,8 +198,12 @@ function calcularArbol() {
             return b.saldoFinal - a.saldoFinal; // Mayor a menor
         }
 
-        let camA = a.pasos.some((p) => p.accionId === "cam" && p.recolectado > 0) ? 1 : 0;
-        let camB = b.pasos.some((p) => p.accionId === "cam" && p.recolectado > 0) ? 1 : 0;
+        let camA = a.pasos.some((p) => p.accionId === "rec1" && p.recolectado > 0)
+            ? 1
+            : 0;
+        let camB = b.pasos.some((p) => p.accionId === "rec1" && p.recolectado > 0)
+            ? 1
+            : 0;
         if (camA !== camB) return camB - camA;
 
         return a.pasos.length - b.pasos.length;
@@ -200,7 +211,7 @@ function calcularArbol() {
 
     rutasEncontradas.forEach((ruta, idx) => {
         const tieneCaminata = ruta.pasos.some(
-            (p) => p.accionId === "cam" && p.recolectado > 0,
+            (p) => p.accionId === "rec1" && p.recolectado > 0,
         );
 
         html += `
@@ -244,7 +255,7 @@ function calcularArbol() {
         </div>
         <div class="card-footer bg-light small text-muted text-start">
         En esta ruta reclamarias <strong>${restanteDiarioIni - ruta.cupoRestante} MP</strong> de tu restante. 
-        Te faltarian <strong>${ruta.cupoRestante} MP</strong> por reclamar de los <strong>800 diarios</strong>.
+        Te faltarian <strong>${Math.max(ruta.cupoRestante, 0)} MP</strong> por reclamar de los <strong>800 diarios</strong>.
         </div>
     </div>`;
     });
