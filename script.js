@@ -143,7 +143,7 @@ function calcularArbol() {
 
                 // Si la acción recolectó MP, el cupo pendiente se reduce a 0 o menos para marcar que se agotó el límite diario
                 let nuevoCupoFaltante = acc.baseRec > 0
-                    ? Math.max(0, cupoDiarioFaltante - acc.baseRec)
+                    ? cupoDiarioFaltante - acc.baseRec
                     : cupoDiarioFaltante;
 
                 explorar(saldoFinal, nuevoCupoFaltante, [
@@ -201,7 +201,7 @@ function calcularArbol() {
         );
 
         // Puntos totales sumados al cupo diario durante la ruta
-        const mpReclamadosEnRuta = mpFaltantesIniciales - Math.max(0, ruta.cupoRestanteFinal);
+        const mpReclamadosEnRuta = mpFaltantesIniciales - ruta.cupoRestanteFinal;
         const mpFaltantesAlFinal = Math.max(0, ruta.cupoRestanteFinal);
 
         html += `
